@@ -242,25 +242,28 @@ class MessageListener(Listener):
             #print("Got: ", msg)
             if(msg != None):
                 #print("msg is: ", db.decode_message(msg.arbitration_id, msg.data))
-                if(msg.arbitration_id == 301):                    
-                    speedMeters[0].value = (msg.data[0] << 8) + msg.data[1]
-                    speedMeters[1].value = (msg.data[2] << 8) + msg.data[3]
-                    speedMeters[2].value = (msg.data[4] << 8) + msg.data[5]
-                    speedMeters[3].value = (msg.data[6] << 8) + msg.data[7]
+                if(msg.arbitration_id == 301):      
+                    speedMeters[0].value = ((msg.data[0] << 8) + msg.data[1]) / 10
+                    speedMeters[1].value = ((msg.data[2] << 8) + msg.data[3]) / 10
+                    speedMeters[2].value = ((msg.data[4] << 8) + msg.data[5]) / 10
+                    speedMeters[3].value = ((msg.data[6] << 8) + msg.data[7]) / 10
+                    print("Got 301: " + speedMeters[0].value + speedMeters[1].value + speedMeters[2].value + speedMeters[3].value)
                     message_decoded = True
 
                 if(msg.arbitration_id == 302):
-                    speedMeters[4].value = (msg.data[0] << 8) + msg.data[1]
-                    speedMeters[5].value = (msg.data[2] << 8) + msg.data[3]
-                    speedMeters[6].value = (msg.data[4] << 8) + msg.data[5]
-                    speedMeters[7].value = (msg.data[6] << 8) + msg.data[7]                    
+                    speedMeters[4].value = ((msg.data[0] << 8) + msg.data[1]) / 10
+                    speedMeters[5].value = ((msg.data[2] << 8) + msg.data[3]) / 10
+                    speedMeters[6].value = ((msg.data[4] << 8) + msg.data[5]) / 10
+                    speedMeters[7].value = ((msg.data[6] << 8) + msg.data[7]) / 10
+                    print("Got 302: " + speedMeters[4].value + speedMeters[5].value + speedMeters[6].value + speedMeters[7].value)
                     message_decoded = True
 
                 if(msg.arbitration_id == 303):
-                    speedMeters[8].value = (msg.data[0] << 8) + msg.data[1]
-                    speedMeters[9].value = (msg.data[2] << 8) + msg.data[3]
-                    speedMeters[10].value = (msg.data[4] << 8) + msg.data[5]
-                    speedMeters[11].value = (msg.data[6] << 8) + msg.data[7]                    
+                    speedMeters[8].value = ((msg.data[0] << 8) + msg.data[1]) / 10
+                    speedMeters[9].value = ((msg.data[2] << 8) + msg.data[3]) / 10
+                    speedMeters[10].value = ((msg.data[4] << 8) + msg.data[5]) / 10
+                    speedMeters[11].value = ((msg.data[6] << 8) + msg.data[7]) / 10
+                    print("Got 303: " + speedMeters[8].value + speedMeters[9].value + speedMeters[10].value + speedMeters[11].value)
                     message_decoded = True
 
             if(message_decoded == False):
