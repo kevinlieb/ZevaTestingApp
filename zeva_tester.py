@@ -33,7 +33,7 @@ Window.left=0
 #Window.fullscreen=True
 
 #set to false when testing without CAN, like on a PC or Mac
-do_can = False;
+do_can = True
 
 #cruiseEnabledState = "OFF"
 #cruiseEngagedState = "OFF"
@@ -59,10 +59,12 @@ bus = 0
 bluetooth_image = 0
 statusText = 0
 bluetooth_image_size = (47,72)
+speedMeters = []
 
 class BunchOfButtons(GridLayout):
     global db
     global bus
+    global speedMeters
 
     grayColor = (1,1,1,1)
     redColor = (0,0.5,0,.85)
@@ -113,7 +115,7 @@ class BunchOfButtons(GridLayout):
 
         def everySecondCallback(instance):
             if(do_can):
-                msg = can.Message(arbitration_id=300,data=[1],is_extended_id=False)
+                msg = can.Message(arbitration_id=300,data=[0,0],is_extended_id=False)
                 try:
                     bus.send(msg)               
                 except:
@@ -125,7 +127,6 @@ class BunchOfButtons(GridLayout):
         super(BunchOfButtons, self).__init__(**kwargs)
 
 
-        speedMeters = []
         #speedMeter = SpeedMeter(max=4.2, tick=0.1, start_angle=-45, end_angle=120,subtick=0.05,label='V', value=3.66, cadran_color='#0f0f0f', needle_color='#ff0000', sectors=(0, '#ffffff'));
         for n in range(12):
             speedMeter = SpeedMeter()
@@ -231,6 +232,7 @@ class MessageListener(Listener):
     def on_message_received(self, msg):
         global bluetooth_image
         global statusText
+        global speedMeters
 
         if msg.is_error_frame or msg.is_remote_frame:
             return
@@ -241,29 +243,29 @@ class MessageListener(Listener):
             #self.ecu.notify(msg.arbitration_id, msg.data, msg.timestamp)
             #print("Got: ", msg)
             if(msg != None):
-                #print("msg is: ", db.decode_message(msg.arbitration_id, msg.data))
+                print("msg is: ", msg)
                 if(msg.arbitration_id == 301):      
-                    speedMeters[0].value = ((msg.data[0] << 8) + msg.data[1]) / 10
-                    speedMeters[1].value = ((msg.data[2] << 8) + msg.data[3]) / 10
-                    speedMeters[2].value = ((msg.data[4] << 8) + msg.data[5]) / 10
-                    speedMeters[3].value = ((msg.data[6] << 8) + msg.data[7]) / 10
-                    print("Got 301: " + speedMeters[0].value + speedMeters[1].value + speedMeters[2].value + speedMeters[3].value)
+                    speedMeters[0].value = ((msg.data[0] << 8) + msg.data[1]) / 100
+                    speedMeters[1].value = ((msg.data[2] << 8) + msg.data[3]) / 100
+                    speedMeters[2].value = ((msg.data[4] << 8) + msg.data[5]) / 100
+                    speedMeters[3].value = ((msg.data[6] << 8) + msg.data[7]) / 100
+                    print("Got 301: ",speedMeters[0].value, speedMeters[1].value,speedMeters[2].value,speedMeters[3].value)
                     message_decoded = True
 
                 if(msg.arbitration_id == 302):
-                    speedMeters[4].value = ((msg.data[0] << 8) + msg.data[1]) / 10
-                    speedMeters[5].value = ((msg.data[2] << 8) + msg.data[3]) / 10
-                    speedMeters[6].value = ((msg.data[4] << 8) + msg.data[5]) / 10
-                    speedMeters[7].value = ((msg.data[6] << 8) + msg.data[7]) / 10
-                    print("Got 302: " + speedMeters[4].value + speedMeters[5].value + speedMeters[6].value + speedMeters[7].value)
+                    speedMeters[4].value = ((msg.data[0] << 8) + msg.data[1]) / 100
+                    speedMeters[5].value = ((msg.data[2] << 8) + msg.data[3]) / 100
+                    speedMeters[6].value = ((msg.data[4] << 8) + msg.data[5]) / 100
+                    speedMeters[7].value = ((msg.data[6] << 8) + msg.data[7]) / 100
+                    #print("Got 302: " + speedMeters[4].value + speedMeters[5].value + speedMeters[6].value + speedMeters[7].value)
                     message_decoded = True
 
                 if(msg.arbitration_id == 303):
-                    speedMeters[8].value = ((msg.data[0] << 8) + msg.data[1]) / 10
-                    speedMeters[9].value = ((msg.data[2] << 8) + msg.data[3]) / 10
-                    speedMeters[10].value = ((msg.data[4] << 8) + msg.data[5]) / 10
-                    speedMeters[11].value = ((msg.data[6] << 8) + msg.data[7]) / 10
-                    print("Got 303: " + speedMeters[8].value + speedMeters[9].value + speedMeters[10].value + speedMeters[11].value)
+                    speedMeters[8].value = ((msg.data[0] << 8) + msg.data[1]) / 100
+                    speedMeters[9].value = ((msg.data[2] << 8) + msg.data[3]) / 100
+                    speedMeters[10].value = ((msg.data[4] << 8) + msg.data[5]) / 100
+                    speedMeters[11].value = ((msg.data[6] << 8) + msg.data[7]) / 100
+                    #print("Got 303: " + speedMeters[8].value + speedMeters[9].value + speedMeters[10].value + speedMeters[11].value)
                     message_decoded = True
 
             if(message_decoded == False):
