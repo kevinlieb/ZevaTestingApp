@@ -19,6 +19,8 @@ from kivy.modules import inspector
 from kivy.uix.scrollview import ScrollView
 from kivy_garden.speedmeter import SpeedMeter
 
+from Bar import Bar
+
 window_width = 800
 window_height = 500
 the_grid_width = window_width
@@ -33,7 +35,8 @@ Window.left=0
 #Window.fullscreen=True
 
 #set to false when testing without CAN, like on a PC or Mac
-do_can = True
+do_can = False
+use_speedmeter = False
 
 #cruiseEnabledState = "OFF"
 #cruiseEngagedState = "OFF"
@@ -60,6 +63,7 @@ bluetooth_image = 0
 statusText = 0
 bluetooth_image_size = (47,72)
 speedMeters = []
+bars = []
 
 class BunchOfButtons(GridLayout):
     global db
@@ -129,17 +133,29 @@ class BunchOfButtons(GridLayout):
 
         #speedMeter = SpeedMeter(max=4.2, tick=0.1, start_angle=-45, end_angle=120,subtick=0.05,label='V', value=3.66, cadran_color='#0f0f0f', needle_color='#ff0000', sectors=(0, '#ffffff'));
         for n in range(12):
-            speedMeter = SpeedMeter()
-            speedMeter.max = 42
-            speedMeter.min = 2
-            speedMeter.start_angle = -135
-            speedMeter.end_angle = 135
-            speedMeter.cadran_color = '#0f0f0f'
-            speedMeter.needle_color = '#ff0000'
-            speedMeters.append(speedMeter)
+            if(use_speedmeter):
+                speedMeter = SpeedMeter()
+                speedMeter.max = 42
+                speedMeter.min = 2
+                speedMeter.start_angle = -135
+                speedMeter.end_angle = 135
+                speedMeter.cadran_color = '#0f0f0f'
+                speedMeter.needle_color = '#ff0000'
+                speedMeters.append(speedMeter)
+            else:
+                bar = Bar();
+                bar.orientation = 'bt';
+                bar.value = (n * 8)
+                bar.color=[.4,.63,.01,1] #'#66a103' a nice green color
+                bars.append(bar)
 
-        for speedMeter in speedMeters:
-            theGrid.add_widget(speedMeter)
+        if(use_speedmeter):
+            for speedMeter in speedMeters:
+                theGrid.add_widget(speedMeter)
+        else:
+            for bar in bars:
+                theGrid.add_widget(bar)            
+
 
 
         with theGrid.canvas.before:
@@ -233,6 +249,7 @@ class MessageListener(Listener):
         global bluetooth_image
         global statusText
         global speedMeters
+        global bars
 
         if msg.is_error_frame or msg.is_remote_frame:
             return
@@ -244,33 +261,43 @@ class MessageListener(Listener):
             #print("Got: ", msg)
             if(msg != None):
                 print("msg is: ", msg)
+                if(use_speedmeter):
+                    elements = speedMeters
+                    scaleFactor = 100
+                else:
+                    elements = bars;
+                    scaleFactor = 100 * (4200 - 2000) #modified bars go from 0 to 450, and our voltages to show are 0v to 4.5
+
                 if(msg.arbitration_id == 301):      
-                    speedMeters[0].value = ((msg.data[0] << 8) + msg.data[1]) / 100
-                    speedMeters[1].value = ((msg.data[2] << 8) + msg.data[3]) / 100
-                    speedMeters[2].value = ((msg.data[4] << 8) + msg.data[5]) / 100
-                    speedMeters[3].value = ((msg.data[6] << 8) + msg.data[7]) / 100
-                    print("Got 301: ",speedMeters[0].value, speedMeters[1].value,speedMeters[2].value,speedMeters[3].value)
+                    elements[0].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
+                    elements[1].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
+                    elements[2].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
+                    elements[3].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
+                    print("Got 301: ",elements[0].value, elements[1].value,elements[2].value,elements[3].value)
                     message_decoded = True
 
                 if(msg.arbitration_id == 302):
-                    speedMeters[4].value = ((msg.data[0] << 8) + msg.data[1]) / 100
-                    speedMeters[5].value = ((msg.data[2] << 8) + msg.data[3]) / 100
-                    speedMeters[6].value = ((msg.data[4] << 8) + msg.data[5]) / 100
-                    speedMeters[7].value = ((msg.data[6] << 8) + msg.data[7]) / 100
-                    #print("Got 302: " + speedMeters[4].value + speedMeters[5].value + speedMeters[6].value + speedMeters[7].value)
+                    elements[4].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
+                    elements[5].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
+                    elements[6].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
+                    elements[7].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
+                    print("Got 302: ",elements[4].value, elements[5].value,elements[6].value,elements[7].value)
                     message_decoded = True
 
                 if(msg.arbitration_id == 303):
-                    speedMeters[8].value = ((msg.data[0] << 8) + msg.data[1]) / 100
-                    speedMeters[9].value = ((msg.data[2] << 8) + msg.data[3]) / 100
-                    speedMeters[10].value = ((msg.data[4] << 8) + msg.data[5]) / 100
-                    speedMeters[11].value = ((msg.data[6] << 8) + msg.data[7]) / 100
-                    #print("Got 303: " + speedMeters[8].value + speedMeters[9].value + speedMeters[10].value + speedMeters[11].value)
+                    elements[8].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
+                    elements[9].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
+                    elements[10].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
+                    elements[11].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
+                    print("Got 303: ",elements[8].value, elements[9].value,elements[10].value,elements[11].value)
+                    message_decoded = True
+
+                if(msg.arbitration_id == 304):
+                    print("Got 304 temperature: ignore for now")
                     message_decoded = True
 
             if(message_decoded == False):
                 print("Unknown message: ", msg.arbitration_id)
-
 
 
         except Exception as e:
