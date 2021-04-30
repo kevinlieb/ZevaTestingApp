@@ -126,7 +126,7 @@ class BunchOfButtons(GridLayout):
                     print("Failed to send awake message")
 
 
-        theGrid = GridLayout(cols=6, rows=3, width=the_grid_width, size_hint=(None, 1))
+        theGrid = GridLayout(cols=6, rows=3, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
 
         super(BunchOfButtons, self).__init__(**kwargs)
 
