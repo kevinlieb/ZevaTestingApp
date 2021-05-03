@@ -35,7 +35,7 @@ Window.left=0
 #Window.fullscreen=True
 
 #set to false when testing without CAN, like on a PC or Mac
-do_can = False
+do_can = True
 use_speedmeter = False
 
 #cruiseEnabledState = "OFF"
@@ -142,19 +142,21 @@ class BunchOfButtons(GridLayout):
                 speedMeter.cadran_color = '#0f0f0f'
                 speedMeter.needle_color = '#ff0000'
                 speedMeters.append(speedMeter)
+                theGrid.add_widget(speedMeter)
             else:
                 bar = Bar();
                 bar.orientation = 'bt';
                 bar.value = (n * 8)
                 bar.color=[.4,.63,.01,1] #'#66a103' a nice green color
                 bars.append(bar)
+                theGrid.add_widget(bar)
 
-        if(use_speedmeter):
-            for speedMeter in speedMeters:
-                theGrid.add_widget(speedMeter)
-        else:
-            for bar in bars:
-                theGrid.add_widget(bar)            
+        # if(use_speedmeter):
+        #     for speedMeter in speedMeters:
+        #         theGrid.add_widget(speedMeter)
+        # else:
+        #     for bar in bars:
+        #         theGrid.add_widget(bar)
 
 
 
@@ -260,13 +262,13 @@ class MessageListener(Listener):
             #self.ecu.notify(msg.arbitration_id, msg.data, msg.timestamp)
             #print("Got: ", msg)
             if(msg != None):
-                print("msg is: ", msg)
+                #print("msg is: ", msg)
                 if(use_speedmeter):
                     elements = speedMeters
                     scaleFactor = 100
                 else:
                     elements = bars;
-                    scaleFactor = 100 * (4200 - 2000) #modified bars go from 0 to 450, and our voltages to show are 0v to 4.5
+                    scaleFactor = 10  #modified bars go from 0 to 450, and our voltages to show are 0v to 4.5
 
                 if(msg.arbitration_id == 301):      
                     elements[0].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
