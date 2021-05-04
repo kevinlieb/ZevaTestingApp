@@ -64,6 +64,7 @@ statusText = 0
 bluetooth_image_size = (47,72)
 speedMeters = []
 bars = []
+meterLabels = []
 
 class BunchOfButtons(GridLayout):
     global db
@@ -142,14 +143,25 @@ class BunchOfButtons(GridLayout):
                 speedMeter.cadran_color = '#0f0f0f'
                 speedMeter.needle_color = '#ff0000'
                 speedMeters.append(speedMeter)
-                theGrid.add_widget(speedMeter)
+                innerGrid = GridLayout(cols=1,rows=2)
+                innerLabel = Label(text='0.0',size_hint=(None, .1), color=[0,0,0,1])
+                meterLabels.append(innerLabel)
+                innerGrid.add_widget(speedMeter)
+                innerGrid.add_widget(innerLabel)
+                theGrid.add_widget(innerGrid)
             else:
                 bar = Bar();
                 bar.orientation = 'bt';
                 bar.value = (n * 8)
                 bar.color=[.4,.63,.01,1] #'#66a103' a nice green color
                 bars.append(bar)
-                theGrid.add_widget(bar)
+                innerGrid = GridLayout(cols=1,rows=2)
+                innerLabel = Label(text='0.0',size_hint=(None, .1), color=[0,0,0,1])
+                meterLabels.append(innerLabel)
+                innerLabel.background_color=[.4,.63,.01,1]
+                innerGrid.add_widget(bar)
+                innerGrid.add_widget(innerLabel)
+                theGrid.add_widget(innerGrid)                
 
         # if(use_speedmeter):
         #     for speedMeter in speedMeters:
@@ -252,6 +264,7 @@ class MessageListener(Listener):
         global statusText
         global speedMeters
         global bars
+        global meterLabels
 
         if msg.is_error_frame or msg.is_remote_frame:
             return
@@ -297,6 +310,9 @@ class MessageListener(Listener):
                 if(msg.arbitration_id == 304):
                     print("Got 304 temperature: ignore for now")
                     message_decoded = True
+
+                for n in range(12):
+                    meterLabels[n].text = "{:.2f}".format(elements[n].value / 100)
 
             if(message_decoded == False):
                 print("Unknown message: ", msg.arbitration_id)
