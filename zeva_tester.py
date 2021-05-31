@@ -4,6 +4,8 @@ from can import Listener
 import sys
 import math
 import array as arr
+import csv
+import time
 
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -119,10 +121,11 @@ class BunchOfButtons(GridLayout):
 
 
         def everySecondCallback(instance):
+            print("Every Second")
             if(do_can):
-                msg1 = can.Message(arbitration_id=300,data=[0,0],is_extended_id=False)
-                msg2 = can.Message(arbitration_id=310,data=[0,0],is_extended_id=False)
-                msg3 = can.Message(arbitration_id=320,data=[0,0],is_extended_id=False)
+                msg1 = can.Message(arbitration_id=300,data=[15,160],is_extended_id=False) #15,0 is 3840
+                msg2 = can.Message(arbitration_id=310,data=[15,160],is_extended_id=False)
+                msg3 = can.Message(arbitration_id=320,data=[15,160],is_extended_id=False)
    
                 try:
                     bus.send(msg1)
@@ -131,14 +134,58 @@ class BunchOfButtons(GridLayout):
                 except:
                     print("Failed to send awake message")
 
+            if(use_speedmeter):
+                elements = speedMeters
+            else:
+                elements = bars;
 
-        theGrid = GridLayout(cols=6, rows=9, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
+            with open('voltages.csv', mode='a') as voltages_file:
+                timeasinteger = int(time.time())
+                voltage_writer = csv.writer(voltages_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                voltage_writer.writerow([timeasinteger,
+                                        elements[0].value,
+                                        elements[1].value,
+                                        elements[2].value,
+                                        elements[3].value,
+                                        elements[4].value,
+                                        elements[5].value,
+                                        elements[6].value,
+                                        elements[7].value,
+                                        elements[8].value,
+                                        elements[9].value,
+                                        elements[10].value,
+                                        elements[11].value,
+                                        elements[12].value,
+                                        elements[13].value,
+                                        elements[14].value,
+                                        elements[15].value,
+                                        elements[16].value,
+                                        elements[17].value,
+                                        elements[18].value,
+                                        elements[19].value,
+                                        elements[20].value,
+                                        elements[21].value,
+                                        elements[22].value,
+                                        elements[23].value,
+                                        elements[24].value,
+                                        elements[25].value,
+                                        elements[26].value,
+                                        elements[27].value,
+                                        elements[28].value,
+                                        elements[29].value,
+                                        elements[30].value,
+                                        elements[31].value])
+
+
+
+
+        theGrid = GridLayout(cols=4, rows=12, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
 
         super(BunchOfButtons, self).__init__(**kwargs)
 
 
         #speedMeter = SpeedMeter(max=4.2, tick=0.1, start_angle=-45, end_angle=120,subtick=0.05,label='V', value=3.66, cadran_color='#0f0f0f', needle_color='#ff0000', sectors=(0, '#ffffff'));
-        for n in range(36):
+        for n in range(32):
             if(use_speedmeter):
                 speedMeter = SpeedMeter()
                 speedMeter.max = 42
@@ -263,11 +310,12 @@ class MessageListener(Listener):
         print("in MessageListener self is ",self)
 
 
-    def parseVoltageCAN(crap, elements, baseElement, msg, scaleFactor):
-        elements[baseElement].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-        elements[baseElement + 1].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-        elements[baseElement + 2].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-        elements[baseElement + 3].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
+    def parseVoltageCAN(crap, elements, baseElement, msg, count, scaleFactor):
+        for n in range(count):
+            elements[baseElement + n].value = ((msg.data[0 + (n * 2)] << 8) + msg.data[(n * 2) + 1]) / scaleFactor
+        # elements[baseElement + 1].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
+        # elements[baseElement + 2].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
+        # elements[baseElement + 3].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
 
 
     def on_message_received(self, msg):
@@ -295,84 +343,41 @@ class MessageListener(Listener):
                     scaleFactor = 10  #modified bars go from 0 to 450, and our voltages to show are 0v to 4.5
 
                 if(msg.arbitration_id == 301):
-                    self.parseVoltageCAN(elements, 0, msg, scaleFactor)
-                    # elements[0].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[1].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[2].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[3].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 301: ",elements[0].value, elements[1].value,elements[2].value,elements[3].value)
+                    self.parseVoltageCAN(elements, 0, msg, 4, scaleFactor)
                     message_decoded = True
 
                 if(msg.arbitration_id == 302):
-                    self.parseVoltageCAN(elements, 4, msg, scaleFactor)
-                    # elements[4].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[5].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[6].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[7].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 302: ",elements[4].value, elements[5].value,elements[6].value,elements[7].value)
+                    self.parseVoltageCAN(elements, 4, msg, 4, scaleFactor)
+                    print("element 4 is: " , msg.data[0] , msg.data[1])
                     message_decoded = True
 
                 if(msg.arbitration_id == 303):
-                    self.parseVoltageCAN(elements, 8, msg, scaleFactor)
-                    # elements[8].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[9].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[10].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[11].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 303: ",elements[8].value, elements[9].value,elements[10].value,elements[11].value)
+                    self.parseVoltageCAN(elements, 8, msg, 4, scaleFactor)
                     message_decoded = True
 
                 if(msg.arbitration_id == 311):      
-                    self.parseVoltageCAN(elements, 12, msg, scaleFactor)
-                    # elements[12].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[13].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[14].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[15].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 311: ",elements[12].value, elements[13].value,elements[14].value,elements[15].value)
+                    self.parseVoltageCAN(elements, 12, msg, 4, scaleFactor)
                     self.message_decoded = True
 
                 if(msg.arbitration_id == 312):
-                    self.parseVoltageCAN(elements, 16, msg, scaleFactor)
-                    # elements[16].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[17].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[18].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[19].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 312: ",elements[16].value, elements[17].value,elements[18].value,elements[19].value)
+                    self.parseVoltageCAN(elements, 16, msg, 4, scaleFactor)
                     message_decoded = True
 
                 if(msg.arbitration_id == 313):
-                    self.parseVoltageCAN(elements, 20, msg, scaleFactor)
-                    # elements[20].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[21].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[22].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[23].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 313: ",elements[20].value, elements[21].value,elements[22].value,elements[23].value)
+                    #do nothing: there is no battery here
+                    #self.parseVoltageCAN(elements, 20, msg, scaleFactor) 
                     message_decoded = True                    
 
                 if(msg.arbitration_id == 321):      
-                    self.parseVoltageCAN(elements, 24, msg, scaleFactor)
-                    # elements[24].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[25].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[26].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[27].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 321: ",elements[24].value, elements[25].value,elements[26].value,elements[27].value)
+                    self.parseVoltageCAN(elements, 20, msg, 4, scaleFactor)
                     message_decoded = True
 
                 if(msg.arbitration_id == 322):
-                    self.parseVoltageCAN(elements, 28, msg, scaleFactor)
-                    # elements[28].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[29].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[30].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[31].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 322: ",elements[28].value, elements[29].value,elements[30].value,elements[31].value)
+                    self.parseVoltageCAN(elements, 24, msg, 4, scaleFactor)
                     message_decoded = True
 
                 if(msg.arbitration_id == 323):
-                    self.parseVoltageCAN(elements, 32, msg, scaleFactor)
-                    # elements[32].value = ((msg.data[0] << 8) + msg.data[1]) / scaleFactor
-                    # elements[33].value = ((msg.data[2] << 8) + msg.data[3]) / scaleFactor
-                    # elements[34].value = ((msg.data[4] << 8) + msg.data[5]) / scaleFactor
-                    # elements[35].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
-                    # print("Got 323: ",elements[32].value, elements[33].value,elements[34].value,elements[35].value)
+                    self.parseVoltageCAN(elements, 28, msg, 4, scaleFactor)
                     message_decoded = True                    
 
                 if(msg.arbitration_id == 304):
@@ -386,7 +391,7 @@ class MessageListener(Listener):
                 if(msg.arbitration_id == 324):
                     print("Got 324 temperature: ignore for now")
                     message_decoded = True
-                for n in range(36):
+                for n in range(32):
                     meterLabels[n].text = "{:.2f}".format(elements[n].value / 100)
 
             if(message_decoded == False):

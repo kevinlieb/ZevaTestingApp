@@ -64,15 +64,15 @@ Builder.load_string('''
         Color:
             rgba: root.color
         Rectangle:
-            pos: self.pos if self.orientation in ('lr', 'bt') else (self.right - self.width*self._value/450., self.y) if root.orientation == 'rl' else (self.x, self.top - self.height*self._value/450.)
-            size: (self.width*self._value/450., self.height) if root.orientation in ('lr', 'rl') else (self.width, self.height*self._value/450.)
+            pos: self.pos if self.orientation in ('lr', 'bt') else (self.right - self.width*self._value/(450.-300.), self.y) if root.orientation == 'rl' else (self.x, self.top - self.height*self._value/(450.-300.))
+            size: (self.width*self._value/(450.-300.), self.height) if root.orientation in ('lr', 'rl') else (self.width, self.height*self._value/(450.-300.))
 ''')
 
 
 class Bar(Widget):
     """Bar representing the value from 0-450 percent range."""
 
-    value = BoundedNumericProperty(0., min=0., max=450.)
+    value = BoundedNumericProperty(0., min=3., max=450.)
     """Value that bar represents.
 
     Accepts values in 0.-450. range (percentage).
@@ -141,6 +141,7 @@ class Bar(Widget):
 
     def on_value(self, instance, value):
         """Handler called when :attr:`value` value changes."""
+        value = value - 300 #to scale
         if self.animated:
             if self._anim:
                 Animation.cancel_all(self)
