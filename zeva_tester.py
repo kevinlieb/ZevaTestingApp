@@ -21,7 +21,11 @@ from kivy.modules import inspector
 from kivy.uix.scrollview import ScrollView
 from kivy_garden.speedmeter import SpeedMeter
 
+import paho.mqtt.client as mqtt
+import json
+
 from Bar import Bar
+import requests
 
 window_width = 800
 window_height = 500
@@ -59,7 +63,8 @@ pair_trigger = False
 
 db = 0
 bus = 0
-
+config = {}
+lastNotificationTime = 0
 
 bluetooth_image = 0
 statusText = 0
@@ -67,6 +72,7 @@ bluetooth_image_size = (47,72)
 speedMeters = []
 bars = []
 meterLabels = []
+mqttClient = []
 
 class BunchOfButtons(GridLayout):
     global db
@@ -79,14 +85,22 @@ class BunchOfButtons(GridLayout):
     def __init__(self, **kwargs):
         global db
         global bus
+        global config
 
         global bluetooth_image, statusText
         global bluetooth_image_size
+
+        global mqttClient
+
+        global lastNotificationTime
 
         self.cols=1
         self.size_hint=(None,None)
         self.size=(window_width, window_height)
         self.pos=(0, 0)        
+
+        with open('config.json') as f:
+            config = json.load(f)
 
 
         #connect to the CAN bus and set up the database 
@@ -94,6 +108,11 @@ class BunchOfButtons(GridLayout):
             bus = can.interface.Bus(bustype='socketcan', channel='can0', bitrate=500000)
             print("just before self is ",self)
             notifier=can.Notifier(bus,[MessageListener(self)])
+
+        mqttClient = mqtt.Client("zeva") # Create a MQTT client object
+        mqttClient.connect("localhost", 1883) # Connect to the test MQTT broker
+        mqttClient.loop_start()
+
 
         def buttonCallback(instance):
             #global grayColor
@@ -122,10 +141,15 @@ class BunchOfButtons(GridLayout):
 
         def everySecondCallback(instance):
             print("Every Second")
+            global lastNotificationTime
+            global config
+
             if(do_can):
-                msg1 = can.Message(arbitration_id=300,data=[15,160],is_extended_id=False) #15,0 is 3840
-                msg2 = can.Message(arbitration_id=310,data=[15,160],is_extended_id=False)
-                msg3 = can.Message(arbitration_id=320,data=[15,160],is_extended_id=False)
+                #16,104 is 4200
+                #16,0 is 4096
+                msg1 = can.Message(arbitration_id=300,data=[16,0],is_extended_id=False) #15,0 is 3840
+                msg2 = can.Message(arbitration_id=310,data=[16,0],is_extended_id=False)
+                msg3 = can.Message(arbitration_id=320,data=[16,0],is_extended_id=False)
    
                 try:
                     bus.send(msg1)
@@ -138,6 +162,26 @@ class BunchOfButtons(GridLayout):
                 elements = speedMeters
             else:
                 elements = bars;
+
+            highestVoltage = 0
+            cellNumber = 0
+
+            for n in range(32):
+                if(elements[n].value > highestVoltage):
+                    highestVoltage = elements[n].value
+                    cellNumber = n
+
+            print("Highest volatage: " + str(highestVoltage))
+
+            if(highestVoltage > 421 and ((time.time() - lastNotificationTime) > 360)):
+                lastNotificationTime = time.time()
+                logString = "high voltage reached on cell " + str(cellNumber) + " at " + str(time.time())
+                print(logString)
+                data = { 'phone':'6502015803', 
+                         'message':logString,
+                         'key':config['textbelt_key']} 
+                response = requests.post('https://textbelt.com/text',data=data)
+
 
             with open('voltages.csv', mode='a') as voltages_file:
                 timeasinteger = int(time.time())
@@ -175,6 +219,11 @@ class BunchOfButtons(GridLayout):
                                         elements[29].value,
                                         elements[30].value,
                                         elements[31].value])
+
+                theElements = []
+                for n in range(31):
+                    theElements.append(elements[n].value)
+                mqttClient.publish("voltages",json.dumps(theElements))
 
 
 
