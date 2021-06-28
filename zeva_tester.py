@@ -147,7 +147,8 @@ class BunchOfButtons(GridLayout):
             if(do_can):
                 #16,104 is 4200
                 #16,0 is 4096
-                msg1 = can.Message(arbitration_id=300,data=[16,0],is_extended_id=False) #15,0 is 3840
+                #15,0 is 3840
+                msg1 = can.Message(arbitration_id=300,data=[16,0],is_extended_id=False) 
                 msg2 = can.Message(arbitration_id=310,data=[16,0],is_extended_id=False)
                 msg3 = can.Message(arbitration_id=320,data=[16,0],is_extended_id=False)
    
@@ -164,18 +165,28 @@ class BunchOfButtons(GridLayout):
                 elements = bars;
 
             highestVoltage = 0
-            cellNumber = 0
+            highestVoltageCellNumber = 0
+
+            lowestVoltage = 422
+            lowestVoltageCellNumber = 0
 
             for n in range(32):
+                elements[n].background_color = [0,0,0,1]
                 if(elements[n].value > highestVoltage):
                     highestVoltage = elements[n].value
-                    cellNumber = n
+                    highestVoltageCellNumber = n
+                if(elements[n].value < lowestVoltage):
+                    lowestVoltage = elements[n].value
+                    lowestVoltageCellNumber = n
 
             print("Highest volatage: " + str(highestVoltage))
+            print("Lowest volatage: " + str(lowestVoltage))
+            elements[highestVoltageCellNumber].background_color = [1,0,0,1]
+            elements[lowestVoltageCellNumber].background_color = [0,0,1,1]
 
-            if(highestVoltage > 421 and ((time.time() - lastNotificationTime) > 360)):
+            if(highestVoltage > 422 and ((time.time() - lastNotificationTime) > 360)):
                 lastNotificationTime = time.time()
-                logString = "high voltage reached on cell " + str(cellNumber) + " at " + str(time.time())
+                logString = "high voltage reached on cell " + str(highestVoltageCellNumber) + " at " + str(time.time())
                 print(logString)
                 data = { 'phone':'6502015803', 
                          'message':logString,
@@ -430,7 +441,8 @@ class MessageListener(Listener):
                     message_decoded = True                    
 
                 if(msg.arbitration_id == 304):
-                    print("Got 304 temperature: ignore for now")
+                    print("Temp 1 is ", (msg.data[0] - 40))
+                    print("Temp 2 is ", (msg.data[1] - 40))
                     message_decoded = True
 
                 if(msg.arbitration_id == 314):
