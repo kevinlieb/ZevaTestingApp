@@ -1,0 +1,385 @@
+
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_: 
+BU_: BMSM0 VCU
+BO_ 300 BMSM0_Request: 2 Vector__XXX
+   SG_ BMSM0_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 301 BMSM0_Cells1to4: 8 BMSM0
+   SG_ BMSM0_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 302 BMSM0_Cells5to8: 8 BMSM0
+   SG_ BMSM0_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 303 BMSM0_Cells9to12: 8 BMSM0
+   SG_ BMSM0_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM0_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 304 BMSM0_Temps: 2 BMSM0
+   SG_ BMSM0_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM0_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM1 VCU
+BO_ 310 BMSM1_Request: 2 Vector__XXX
+   SG_ BMSM1_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 311 BMSM1_Cells1to4: 8 BMSM1
+   SG_ BMSM1_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 312 BMSM1_Cells5to8: 8 BMSM1
+   SG_ BMSM1_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 313 BMSM1_Cells9to12: 8 BMSM1
+   SG_ BMSM1_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM1_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 314 BMSM1_Temps: 2 BMSM1
+   SG_ BMSM1_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM1_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM2 VCU
+BO_ 320 BMSM2_Request: 2 Vector__XXX
+   SG_ BMSM2_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 321 BMSM2_Cells1to4: 8 BMSM2
+   SG_ BMSM2_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 322 BMSM2_Cells5to8: 8 BMSM2
+   SG_ BMSM2_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 323 BMSM2_Cells9to12: 8 BMSM2
+   SG_ BMSM2_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM2_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 324 BMSM2_Temps: 2 BMSM2
+   SG_ BMSM2_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM2_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM3 VCU
+BO_ 330 BMSM3_Request: 2 Vector__XXX
+   SG_ BMSM3_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 331 BMSM3_Cells1to4: 8 BMSM3
+   SG_ BMSM3_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 332 BMSM3_Cells5to8: 8 BMSM3
+   SG_ BMSM3_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 333 BMSM3_Cells9to12: 8 BMSM3
+   SG_ BMSM3_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM3_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 334 BMSM3_Temps: 2 BMSM3
+   SG_ BMSM3_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM3_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM4 VCU
+BO_ 340 BMSM4_Request: 2 Vector__XXX
+   SG_ BMSM4_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 341 BMSM4_Cells1to4: 8 BMSM4
+   SG_ BMSM4_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 342 BMSM4_Cells5to8: 8 BMSM4
+   SG_ BMSM4_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 343 BMSM4_Cells9to12: 8 BMSM4
+   SG_ BMSM4_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM4_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 344 BMSM4_Temps: 2 BMSM4
+   SG_ BMSM4_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM4_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM5 VCU
+BO_ 350 BMSM5_Request: 2 Vector__XXX
+   SG_ BMSM5_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 351 BMSM5_Cells1to4: 8 BMSM5
+   SG_ BMSM5_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 352 BMSM5_Cells5to8: 8 BMSM5
+   SG_ BMSM5_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 353 BMSM5_Cells9to12: 8 BMSM5
+   SG_ BMSM5_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM5_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 354 BMSM5_Temps: 2 BMSM5
+   SG_ BMSM5_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM5_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM6 VCU
+BO_ 360 BMSM6_Request: 2 Vector__XXX
+   SG_ BMSM6_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 361 BMSM6_Cells1to4: 8 BMSM6
+   SG_ BMSM6_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 362 BMSM6_Cells5to8: 8 BMSM6
+   SG_ BMSM6_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 363 BMSM6_Cells9to12: 8 BMSM6
+   SG_ BMSM6_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM6_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 364 BMSM6_Temps: 2 BMSM6
+   SG_ BMSM6_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM6_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM7 VCU
+BO_ 370 BMSM7_Request: 2 Vector__XXX
+   SG_ BMSM7_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 371 BMSM7_Cells1to4: 8 BMSM7
+   SG_ BMSM7_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 372 BMSM7_Cells5to8: 8 BMSM7
+   SG_ BMSM7_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 373 BMSM7_Cells9to12: 8 BMSM7
+   SG_ BMSM7_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM7_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 374 BMSM7_Temps: 2 BMSM7
+   SG_ BMSM7_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM7_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM8 VCU
+BO_ 380 BMSM8_Request: 2 Vector__XXX
+   SG_ BMSM8_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 381 BMSM8_Cells1to4: 8 BMSM8
+   SG_ BMSM8_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 382 BMSM8_Cells5to8: 8 BMSM8
+   SG_ BMSM8_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 383 BMSM8_Cells9to12: 8 BMSM8
+   SG_ BMSM8_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM8_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 384 BMSM8_Temps: 2 BMSM8
+   SG_ BMSM8_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM8_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM9 VCU
+BO_ 390 BMSM9_Request: 2 Vector__XXX
+   SG_ BMSM9_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 391 BMSM9_Cells1to4: 8 BMSM9
+   SG_ BMSM9_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 392 BMSM9_Cells5to8: 8 BMSM9
+   SG_ BMSM9_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 393 BMSM9_Cells9to12: 8 BMSM9
+   SG_ BMSM9_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM9_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 394 BMSM9_Temps: 2 BMSM9
+   SG_ BMSM9_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM9_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM10 VCU
+BO_ 400 BMSM10_Request: 2 Vector__XXX
+   SG_ BMSM10_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 401 BMSM10_Cells1to4: 8 BMSM10
+   SG_ BMSM10_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 402 BMSM10_Cells5to8: 8 BMSM10
+   SG_ BMSM10_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 403 BMSM10_Cells9to12: 8 BMSM10
+   SG_ BMSM10_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM10_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 404 BMSM10_Temps: 2 BMSM10
+   SG_ BMSM10_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM10_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM11 VCU
+BO_ 410 BMSM11_Request: 2 Vector__XXX
+   SG_ BMSM11_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 411 BMSM11_Cells1to4: 8 BMSM11
+   SG_ BMSM11_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 412 BMSM11_Cells5to8: 8 BMSM11
+   SG_ BMSM11_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 413 BMSM11_Cells9to12: 8 BMSM11
+   SG_ BMSM11_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM11_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 414 BMSM11_Temps: 2 BMSM11
+   SG_ BMSM11_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM11_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM12 VCU
+BO_ 420 BMSM12_Request: 2 Vector__XXX
+   SG_ BMSM12_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 421 BMSM12_Cells1to4: 8 BMSM12
+   SG_ BMSM12_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 422 BMSM12_Cells5to8: 8 BMSM12
+   SG_ BMSM12_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 423 BMSM12_Cells9to12: 8 BMSM12
+   SG_ BMSM12_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM12_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 424 BMSM12_Temps: 2 BMSM12
+   SG_ BMSM12_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM12_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM13 VCU
+BO_ 430 BMSM13_Request: 2 Vector__XXX
+   SG_ BMSM13_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 431 BMSM13_Cells1to4: 8 BMSM13
+   SG_ BMSM13_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 432 BMSM13_Cells5to8: 8 BMSM13
+   SG_ BMSM13_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 433 BMSM13_Cells9to12: 8 BMSM13
+   SG_ BMSM13_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM13_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 434 BMSM13_Temps: 2 BMSM13
+   SG_ BMSM13_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM13_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM14 VCU
+BO_ 440 BMSM14_Request: 2 Vector__XXX
+   SG_ BMSM14_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 441 BMSM14_Cells1to4: 8 BMSM14
+   SG_ BMSM14_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 442 BMSM14_Cells5to8: 8 BMSM14
+   SG_ BMSM14_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 443 BMSM14_Cells9to12: 8 BMSM14
+   SG_ BMSM14_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM14_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 444 BMSM14_Temps: 2 BMSM14
+   SG_ BMSM14_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM14_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+BU_: BMSM15 VCU
+BO_ 450 BMSM15_Request: 2 Vector__XXX
+   SG_ BMSM15_Req : 7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 451 BMSM15_Cells1to4: 8 BMSM15
+   SG_ BMSM15_Cell1 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell2 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell3 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell4 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 452 BMSM15_Cells5to8: 8 BMSM15
+   SG_ BMSM15_Cell5 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell6 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell7 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell8 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 453 BMSM15_Cells9to12: 8 BMSM15
+   SG_ BMSM15_Cell9 :  7|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell10 : 23|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell11 : 39|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+   SG_ BMSM15_Cell12 : 55|16@0+ (0.001,0) [0|5] "V" Vector__XXX
+BO_ 454 BMSM15_Temps: 2 BMSM15
+   SG_ BMSM15_Temp1 : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+   SG_ BMSM15_Temp2 : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
