@@ -25,6 +25,7 @@ import paho.mqtt.client as mqtt
 import json
 
 from Bar import Bar
+from CurrentBar import CurrentBar
 import requests
 
 window_width = 800
@@ -71,13 +72,21 @@ statusText = 0
 bluetooth_image_size = (47,72)
 speedMeters = []
 bars = []
+ampMeter = CurrentBar()
 meterLabels = []
 mqttClient = []
+current = 0.0
+fakeCurrent = 0
+skipCounter = 0
 
 class BunchOfButtons(GridLayout):
     global db
     global bus
     global speedMeters
+    global ampMeter
+    global current
+    global fakeCurrent
+    global skipCounter
 
     grayColor = (1,1,1,1)
     redColor = (0,0.5,0,.85)
@@ -186,13 +195,15 @@ class BunchOfButtons(GridLayout):
 
             if(highestVoltage > 422 and ((time.time() - lastNotificationTime) > 360)):
                 lastNotificationTime = time.time()
-                logString = "high voltage reached on cell " + str(highestVoltageCellNumber) + " at " + str(time.time())
+                logString = "high voltage reached on cell " + str(highestVoltageCellNumber) + " at " + time.strftime('%l:%M%p %Z on %b %d, %Y')
                 print(logString)
                 data = { 'phone':'6502015803', 
                          'message':logString,
                          'key':config['textbelt_key']} 
                 response = requests.post('https://textbelt.com/text',data=data)
 
+
+            ampMeter.value = current
 
             with open('voltages.csv', mode='a') as voltages_file:
                 timeasinteger = int(time.time())
@@ -229,17 +240,18 @@ class BunchOfButtons(GridLayout):
                                         elements[28].value,
                                         elements[29].value,
                                         elements[30].value,
-                                        elements[31].value])
+                                        elements[31].value,
+                                        current])
 
                 theElements = []
                 for n in range(31):
                     theElements.append(elements[n].value)
                 mqttClient.publish("voltages",json.dumps(theElements))
+                mqttClient.publish("current",current) 
 
 
 
-
-        theGrid = GridLayout(cols=4, rows=12, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
+        theGrid = GridLayout(cols=4, rows=16, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
 
         super(BunchOfButtons, self).__init__(**kwargs)
 
@@ -273,7 +285,13 @@ class BunchOfButtons(GridLayout):
                 innerLabel.background_color=[.4,.63,.01,1]
                 innerGrid.add_widget(bar)
                 innerGrid.add_widget(innerLabel)
-                theGrid.add_widget(innerGrid)                
+                theGrid.add_widget(innerGrid) 
+
+        ampMeter = CurrentBar()
+        ampMeter.orientation = 'bt';
+        ampMeter.max = 40000
+        ampMeter.min = -40000
+        theGrid.add_widget(ampMeter)               
 
         # if(use_speedmeter):
         #     for speedMeter in speedMeters:
@@ -378,12 +396,23 @@ class MessageListener(Listener):
         # elements[baseElement + 3].value = ((msg.data[6] << 8) + msg.data[7]) / scaleFactor
 
 
+    def parseCurrent(crap, msg):
+        if(len(msg.data) >= 3):
+            return( (msg.data[0] << 24) + (msg.data[1] << 16) | (msg.data[2] << 8) | msg.data[3])
+        else:
+            return 0.0
+
+
     def on_message_received(self, msg):
         global bluetooth_image
         global statusText
         global speedMeters
         global bars
+        global ampMeter
         global meterLabels
+        global current
+        global fakeCurrent
+        global skipCounter
 
         if msg.is_error_frame or msg.is_remote_frame:
             return
@@ -417,7 +446,7 @@ class MessageListener(Listener):
 
                 if(msg.arbitration_id == 311):      
                     self.parseVoltageCAN(elements, 12, msg, 4, scaleFactor)
-                    self.message_decoded = True
+                    message_decoded = True
 
                 if(msg.arbitration_id == 312):
                     self.parseVoltageCAN(elements, 16, msg, 4, scaleFactor)
@@ -452,6 +481,30 @@ class MessageListener(Listener):
                 if(msg.arbitration_id == 324):
                     print("Got 324 temperature: ignore for now")
                     message_decoded = True
+
+                if(msg.arbitration_id == 0x3C3):
+                    current = self.parseCurrent(msg)
+                    if (current > 2147483648):
+                        current -= 2147483648;
+                    else:
+                        current = -(2147483648 - current);
+
+                    current = current / 1000
+
+                    #print("Current: ", current)
+                    #only update values every 100 samples
+                    if(skipCounter == 100):
+                        fakeCurrent = fakeCurrent + 10;
+                        if(fakeCurrent > 4000):
+                            fakeCurrent = -4000
+                            skipCounter = 1;
+                        ampMeter.value = current
+                    else:
+                        skipCounter = skipCounter + 1
+
+
+                    message_decoded = True
+
                 for n in range(32):
                     meterLabels[n].text = "{:.2f}".format(elements[n].value / 100)
 
