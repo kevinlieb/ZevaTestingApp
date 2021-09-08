@@ -6,6 +6,7 @@ import math
 import array as arr
 import csv
 import time
+import relay_ft245r
 
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -64,6 +65,9 @@ pair_trigger = False
 
 db = 0
 bus = 0
+relayboard = 0
+dev_list = {}
+
 config = {}
 lastNotificationTime = 0
 
@@ -72,6 +76,8 @@ statusText = 0
 bluetooth_image_size = (47,72)
 speedMeters = []
 bars = []
+temperatures = []
+previousVoltages = []
 ampMeter = CurrentBar()
 meterLabels = []
 mqttClient = []
@@ -81,8 +87,11 @@ skipCounter = 0
 
 class BunchOfButtons(GridLayout):
     global db
+    global dev_list
+    global relayboard
     global bus
     global speedMeters
+    global temperatures
     global ampMeter
     global current
     global fakeCurrent
@@ -110,6 +119,19 @@ class BunchOfButtons(GridLayout):
 
         with open('config.json') as f:
             config = json.load(f)
+
+        relayboard = relay_ft245r.FT245R()
+        dev_list = relayboard.list_dev()
+
+        # list of FT245R devices are returned
+        if len(dev_list) == 0:
+            print('No FT245R devices found')
+        else:
+            dev = dev_list[0]
+            print('Using device with serial number ' + str(dev.serial_number))
+            #BMS loop on to allow charging
+            relayboard.connect(dev_list[0])
+            relayboard.switchon(1)
 
 
         #connect to the CAN bus and set up the database 
@@ -153,6 +175,17 @@ class BunchOfButtons(GridLayout):
             global lastNotificationTime
             global config
 
+            timeasinteger = int(time.time())
+
+            #click and clack test disabled
+            # if(len(dev_list) > 0):
+            #     #print("Device zero is ",dev_list[0])
+            #     relayboard.connect(dev_list[0])
+            #     if(timeasinteger % 2 == 0):
+            #         relayboard.switchon(2)
+            #     else:
+            #         relayboard.switchoff(2)
+
             if(do_can):
                 #16,104 is 4200
                 #16,0 is 4096
@@ -179,6 +212,14 @@ class BunchOfButtons(GridLayout):
             lowestVoltage = 422
             lowestVoltageCellNumber = 0
 
+            #if previous voltages is empty initialize it here 
+            if(len(previousVoltages) == 0):
+                for n in range(32):
+                    previousVoltages.append(elements[n].value)
+
+            biggestDifference = 0
+            whereBiggestDifference = 0
+
             for n in range(32):
                 elements[n].background_color = [0,0,0,1]
                 if(elements[n].value > highestVoltage):
@@ -188,12 +229,24 @@ class BunchOfButtons(GridLayout):
                     lowestVoltage = elements[n].value
                     lowestVoltageCellNumber = n
 
+                #calculate the biggest change in any cell voltage betweeen last sample
+                absoluteDifference = abs(elements[n].value - previousVoltages[n])
+                if(absoluteDifference > biggestDifference):
+                    whereBiggestDifference = n
+                    biggestDifference = absoluteDifference
+
+            for n in range(32):
+                previousVoltages[n] = elements[n].value
+
             print("Highest volatage: " + str(highestVoltage))
             print("Lowest volatage: " + str(lowestVoltage))
+            print("biggest difference: " + str(biggestDifference) + " at " + str(whereBiggestDifference))
             elements[highestVoltageCellNumber].background_color = [1,0,0,1]
             elements[lowestVoltageCellNumber].background_color = [0,0,1,1]
 
+            #send a text if any voltage is higher than 4.22v TODO: stop the charger
             if(highestVoltage > 422 and ((time.time() - lastNotificationTime) > 360)):
+            #if(highestVoltage > 370 and ((time.time() - lastNotificationTime) > 360)):
                 lastNotificationTime = time.time()
                 logString = "high voltage reached on cell " + str(highestVoltageCellNumber) + " at " + time.strftime('%l:%M%p %Z on %b %d, %Y')
                 print(logString)
@@ -201,54 +254,63 @@ class BunchOfButtons(GridLayout):
                          'message':logString,
                          'key':config['textbelt_key']} 
                 response = requests.post('https://textbelt.com/text',data=data)
+                relayboard.connect(dev_list[0])
+                relayboard.switchoff(1)
 
 
             ampMeter.value = current
 
-            with open('voltages.csv', mode='a') as voltages_file:
-                timeasinteger = int(time.time())
-                voltage_writer = csv.writer(voltages_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                voltage_writer.writerow([timeasinteger,
-                                        elements[0].value,
-                                        elements[1].value,
-                                        elements[2].value,
-                                        elements[3].value,
-                                        elements[4].value,
-                                        elements[5].value,
-                                        elements[6].value,
-                                        elements[7].value,
-                                        elements[8].value,
-                                        elements[9].value,
-                                        elements[10].value,
-                                        elements[11].value,
-                                        elements[12].value,
-                                        elements[13].value,
-                                        elements[14].value,
-                                        elements[15].value,
-                                        elements[16].value,
-                                        elements[17].value,
-                                        elements[18].value,
-                                        elements[19].value,
-                                        elements[20].value,
-                                        elements[21].value,
-                                        elements[22].value,
-                                        elements[23].value,
-                                        elements[24].value,
-                                        elements[25].value,
-                                        elements[26].value,
-                                        elements[27].value,
-                                        elements[28].value,
-                                        elements[29].value,
-                                        elements[30].value,
-                                        elements[31].value,
-                                        current])
+            #if no temperatures are set yet initialize them here 
+            if(len(temperatures) == 0):
+                temperatures.append(0.0)
 
-                theElements = []
-                for n in range(31):
-                    theElements.append(elements[n].value)
-                mqttClient.publish("voltages",json.dumps(theElements))
-                mqttClient.publish("current",current) 
+            #only log if there has been a significant change between last logged point
+            if(biggestDifference > 0.25):
+                print("logging")
+                with open('voltages.csv', mode='a') as voltages_file:
+                    voltage_writer = csv.writer(voltages_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    voltage_writer.writerow([timeasinteger,
+                                            elements[0].value,
+                                            elements[1].value,
+                                            elements[2].value,
+                                            elements[3].value,
+                                            elements[4].value,
+                                            elements[5].value,
+                                            elements[6].value,
+                                            elements[7].value,
+                                            elements[8].value,
+                                            elements[9].value,
+                                            elements[10].value,
+                                            elements[11].value,
+                                            elements[12].value,
+                                            elements[13].value,
+                                            elements[14].value,
+                                            elements[15].value,
+                                            elements[16].value,
+                                            elements[17].value,
+                                            elements[18].value,
+                                            elements[19].value,
+                                            elements[20].value,
+                                            elements[21].value,
+                                            elements[22].value,
+                                            elements[23].value,
+                                            elements[24].value,
+                                            elements[25].value,
+                                            elements[26].value,
+                                            elements[27].value,
+                                            elements[28].value,
+                                            elements[29].value,
+                                            elements[30].value,
+                                            elements[31].value,
+                                            temperatures[0],
+                                            current])
 
+            theElements = []
+            for n in range(31):
+                theElements.append(elements[n].value)
+            mqttClient.publish("voltages",json.dumps(theElements))
+            mqttClient.publish("current",current) 
+            mqttClient.publish("temperatures",int(temperatures[0])) 
 
 
         theGrid = GridLayout(cols=4, rows=16, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
@@ -408,6 +470,7 @@ class MessageListener(Listener):
         global statusText
         global speedMeters
         global bars
+        global temperatures
         global ampMeter
         global meterLabels
         global current
@@ -470,6 +533,8 @@ class MessageListener(Listener):
                     message_decoded = True                    
 
                 if(msg.arbitration_id == 304):
+                    temperatures[0] = (msg.data[0] - 40)
+                    temperatures[1] = (msg.data[1] - 40)
                     print("Temp 1 is ", (msg.data[0] - 40))
                     print("Temp 2 is ", (msg.data[1] - 40))
                     message_decoded = True
