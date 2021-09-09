@@ -30,6 +30,7 @@ import paho.mqtt.client as mqtt
 import time
 
 current = 0
+temperatures = 0
 lastMessageTime = 0
 highestVoltage = 0
 lowestVoltage = 500
@@ -95,7 +96,8 @@ class TempCharacteristic(Characteristic):
 
             highByteCurrent = (int(float(current)) & 0xff00) >> 8
             lowByteCurrent  = (int(float(current)) & 0x00ff)
-            value = [highByteHighestVoltage, lowByteHighestVoltage, highByteLowestVoltage, lowByteLowestVoltage, highByteCurrent, lowByteCurrent]
+
+            value = [highByteHighestVoltage, lowByteHighestVoltage, highByteLowestVoltage, lowByteLowestVoltage, highByteCurrent, lowByteCurrent, temperatures]
 
         print(value)
         return value
@@ -195,6 +197,7 @@ def on_connect(client, userdata, flags, rc):
     #client.subscribe("$SYS/#")
     mqttClient.subscribe("voltages")
     mqttClient.subscribe("current")
+    mqttClient.subscribe("temperatures")
 
 def processVoltages(client, userdata, message):
       global globalMessage
@@ -202,6 +205,7 @@ def processVoltages(client, userdata, message):
       global lowestVoltage
       global lastMessageTime
       global current
+      global temperatures
 
       print("Got a message")
       lastMessageTime = current_milli_time()
@@ -226,6 +230,10 @@ def processVoltages(client, userdata, message):
 
       if(topic == 'current'):
           current = message      
+
+      if(topic == 'temperatures'):
+          print("Got temperatures of ", message)
+          temperatures = int(message)
 
 
 app = Application()
