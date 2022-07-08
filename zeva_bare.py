@@ -6,6 +6,7 @@ import struct
 import math
 import array as arr
 import csv
+import serial
 import time
 from timeloop import Timeloop
 from datetime import timedelta
@@ -35,6 +36,7 @@ current = 0.0
 fakeCurrent = 0
 skipCounter = 0
 elements = []
+zillaTemperature = 0
 gps_lat = 0.0
 gps_lon = 0.0
 gps_speed = 0.0
@@ -52,16 +54,32 @@ class BunchOfButtons():
     global fakeCurrent
     global skipCounter
     global elements
+    global zillaTemperature
     global gps_lat, gps_lon, gps_speed, gps_alt, gps_course, gps_sat_in_use, gps_valid
+
+    def processMqttMessage(self, client, userdata, message):
+        topic = str(message.topic)
+        message = str(message.payload.decode("utf-8"))
+
+        print("~~~~~>Got topic: ", topic)
+        if(topic == 'zillaTemperature'):
+            zillaTemperature = message
+            print("Got zilla temperature of ",zillaTemperature)
+
+    def mqttOnConnect(self, client, userdata, flags, rc):
+        print("mqttOnConnect: userdata ",userdata," and flags ",flags, " and rc ",rc)
+        mqttClient.subscribe("zillaTemperature")
+
+    def mqttOnDisconnect(self, client, userdata,  rc):
+        print("!!!! mqttOnDisconnect !!!!")
 
     def __init__(self, **kwargs):
         global db
         global bus
         global config
-
         global mqttClient
-
         global lastNotificationTime
+        global zillaTemperature
 
         tl = Timeloop()
 
@@ -93,6 +111,9 @@ class BunchOfButtons():
 
         mqttClient = mqtt.Client("zeva") # Create a MQTT client object
         mqttClient.connect("localhost", 1883) # Connect to the test MQTT broker
+        mqttClient.on_connect = self.mqttOnConnect
+        mqttClient.on_disconnect = self.mqttOnDisconnect
+        mqttClient.on_message = self.processMqttMessage
         mqttClient.loop_start()
 
         def print_message(msg):
@@ -101,7 +122,7 @@ class BunchOfButtons():
 
         @tl.job(interval=timedelta(seconds=1)) 
         def everySecondCallback():
-            print("Every Second")
+            print("Every Second: ", str(time.strftime("%Y-%m-%d %H:%M:%S")))
             global lastNotificationTime
             global previousVoltages
             global config
@@ -110,11 +131,14 @@ class BunchOfButtons():
 
             if(do_can):
                 #16,104 is 4200
+                #16,74 is 4170
                 #16,0 is 4096
                 #15,0 is 3840
-                msg1 = can.Message(arbitration_id=300,data=[16,0],is_extended_id=False) 
-                msg2 = can.Message(arbitration_id=310,data=[16,0],is_extended_id=False)
-                msg3 = can.Message(arbitration_id=320,data=[16,0],is_extended_id=False)
+                #14,0 is 3584
+                #15,176 is 4016
+                msg1 = can.Message(arbitration_id=300,data=[16,74],is_extended_id=False) 
+                msg2 = can.Message(arbitration_id=310,data=[16,74],is_extended_id=False)
+                msg3 = can.Message(arbitration_id=320,data=[16,74],is_extended_id=False)
    
                 try:
                     bus.send(msg1)
@@ -158,7 +182,8 @@ class BunchOfButtons():
 
             print("Highest voltage: " + str(highestVoltage))
             print("Lowest voltage: " + str(lowestVoltage))
-            print("biggest difference: " + str(biggestDifference) + " at " + str(whereBiggestDifference))
+            biggestDifferenceFormatted = round(biggestDifference, 4)
+            print("biggest difference: " + str(biggestDifferenceFormatted) + " at " + str(whereBiggestDifference)) 
 
             #send a text if any voltage is higher than 4.22v
             if(highestVoltage > 422 and ((time.time() - lastNotificationTime) > 360)):
@@ -172,6 +197,15 @@ class BunchOfButtons():
                 relayboard.connect(dev_list[0])
                 relayboard.switchoff(1)
 
+            # if any voltage goes back under 4.19v turn the BMS relay back on
+            if(highestVoltage < 419):
+                try:
+                    relayboard.connect(dev_list[0])
+                    relayboard.switchon(1)
+                except:
+                    print("Failed to activate USB relay")
+
+
             ampMeter = current
 
             #if no temperatures are set yet initialize them here 
@@ -180,7 +214,7 @@ class BunchOfButtons():
                     temperatures.append(0.0)
 
             #only log if there has been a significant change between last logged point
-            if(biggestDifference > 0.25):
+            if(biggestDifference > 0.25 or gps_speed > 2):
                 print("logging")
                 with open('voltages.csv', mode='a') as voltages_file:
                     voltage_writer = csv.writer(voltages_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -219,7 +253,8 @@ class BunchOfButtons():
                                             elements[31],
                                             temperatures[0],
                                             current,
-                                            gps_lat, gps_lon, gps_speed, gps_alt, gps_course, gps_sat_in_use, gps_valid])
+                                            gps_lat, gps_lon, gps_speed, gps_alt, gps_course, gps_sat_in_use, gps_valid,
+                                            zillaTemperature])
 
             theElements = []
             for n in range(32):
@@ -227,6 +262,7 @@ class BunchOfButtons():
             mqttClient.publish("voltages",json.dumps(theElements))
             mqttClient.publish("current",current) 
             mqttClient.publish("temperatures",int(temperatures[0])) 
+            mqttClient.publish("speed",int(gps_speed)) 
 
 
         #theGrid = GridLayout(cols=4, rows=16, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
@@ -240,7 +276,7 @@ class ZevaApp():
     def run(self):
         #self.size=(800,600)        
         return BunchOfButtons()
-
+        
 class MessageListener(Listener):
     global bus
     global statusText
@@ -319,7 +355,7 @@ class MessageListener(Listener):
                 if(msg.arbitration_id == 304):
                     temperatures[0] = (msg.data[0] - 40)
                     temperatures[1] = (msg.data[1] - 40)
-                    print("Temp 1 is ", (msg.data[0] - 40))
+                    #print("Temp 1 is ", (msg.data[0] - 40))
                     #print("Temp 2 is ", (msg.data[1] - 40))
                     message_decoded = True
 
@@ -334,7 +370,7 @@ class MessageListener(Listener):
                 #GPS location: 33.0987473926358, -117.25471634345958
                 #         Lon:  3270148061      Lat:     1107585725  
                 if(msg.arbitration_id == 0xA0000):
-                    print("GPS Location!")
+                    #print("GPS Location!")
 
                     lat_bytearray = bytearray([msg.data[3], msg.data[2], msg.data[1], msg.data[0]])
                     lon_bytearray = bytearray([msg.data[7], msg.data[6], msg.data[5], msg.data[4]])
@@ -343,12 +379,12 @@ class MessageListener(Listener):
                     gps_lon_raw = struct.unpack('<f', lon_bytearray)
                     gps_lat = gps_lat_raw[0]
                     gps_lon = gps_lon_raw[0]
-                    print("Lat: ", gps_lat, " Lon: ", gps_lon)
+                    #print("Lat: ", gps_lat, " Lon: ", gps_lon)
                     message_decoded = True
 
                 #GPS speed / alt / heading / valid
                 if(msg.arbitration_id == 0xA0001):
-                    print("GPS speed / alt / etc")
+                    #print("GPS speed / alt / etc")
                     gps_speed_bytearray = bytearray([msg.data[1], msg.data[0]])
                     gps_alt_bytearray = bytearray([msg.data[3], msg.data[2]])
                     gps_course_bytearray = bytearray([msg.data[5], msg.data[4]])
@@ -363,16 +399,17 @@ class MessageListener(Listener):
                     gps_alt = gps_alt_raw[0]
                     gps_course = gps_course_raw[0] / 100
 
-                    print("Speed: ", )
-                    print("Alt: ", gps_alt)
-                    print("Course", gps_course)
-                    print("Sats in use: ", gps_sat_in_use)
-                    print("Valid?: ", gps_valid)
+                    #print("Speed: ", )
+                    #print("Alt: ", gps_alt)
+                    #print("Course", gps_course)
+                    #print("Sats in use: ", gps_sat_in_use)
+                    #print("Valid?: ", gps_valid)
+                    mqttClient.publish("speed",int(gps_speed)) #send the speed every time you get it
                     message_decoded = True
 
                 #GPS time
                 if(msg.arbitration_id == 0xA0002):
-                    print("GPS time: toss for now")
+                    #print("GPS time: toss for now")
                     message_decoded = True
 
                 #GPS misc 1: don't know what it means

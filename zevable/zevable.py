@@ -30,10 +30,12 @@ import paho.mqtt.client as mqtt
 import time
 
 current = 0
+gps_speed = 0
 temperatures = 0
 lastMessageTime = 0
 highestVoltage = 0
 lowestVoltage = 500
+zillaTemperature = 0
 
 GATT_CHRC_IFACE = "org.bluez.GattCharacteristic1"
 NOTIFY_TIMEOUT = 5000
@@ -97,7 +99,7 @@ class TempCharacteristic(Characteristic):
             highByteCurrent = (int(float(current)) & 0xff00) >> 8
             lowByteCurrent  = (int(float(current)) & 0x00ff)
 
-            value = [highByteHighestVoltage, lowByteHighestVoltage, highByteLowestVoltage, lowByteLowestVoltage, highByteCurrent, lowByteCurrent, temperatures]
+            value = [highByteHighestVoltage, lowByteHighestVoltage, highByteLowestVoltage, lowByteLowestVoltage, highByteCurrent, lowByteCurrent, temperatures, int(gps_speed)]
 
         print(value)
         return value
@@ -198,6 +200,11 @@ def on_connect(client, userdata, flags, rc):
     mqttClient.subscribe("voltages")
     mqttClient.subscribe("current")
     mqttClient.subscribe("temperatures")
+    mqttClient.subscribe("speed")
+    mqttClient.subscribe("zillaTemperature")
+
+def on_disconnect(client, userdata, flags, rc):    
+    print("on_disconnect called")
 
 def processVoltages(client, userdata, message):
       global globalMessage
@@ -205,7 +212,9 @@ def processVoltages(client, userdata, message):
       global lowestVoltage
       global lastMessageTime
       global current
+      global gps_speed
       global temperatures
+      global zillaTemperature
 
       print("Got a message")
       lastMessageTime = current_milli_time()
@@ -231,10 +240,19 @@ def processVoltages(client, userdata, message):
       if(topic == 'current'):
           current = message      
 
+      if(topic == 'speed'):
+          gps_speed = message      
+
+      if(topic == 'zillaTemperature'):
+          zillaTemperature = message
+
       if(topic == 'temperatures'):
           print("Got temperatures of ", message)
           temperatures = int(message)
-
+          if temperatures < 0:
+            print("Bad Temperature!")
+            temperatures = 1;
+          
 
 app = Application()
 app.add_service(ThermometerService(0))
@@ -249,6 +267,7 @@ try:
     mqttClient.subscribe("#")
     mqttClient.on_message = processVoltages
     mqttClient.on_connect = on_connect
+    mqttClient.on_disconnect = on_disconnect
     mqttClient.loop_start()
 
 
