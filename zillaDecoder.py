@@ -65,28 +65,34 @@ class ZillaDecoder:
         while 1:
             readstuff = ser.readline()
             print("READB:",readstuff)
-            thesplit = readstuff.decode("utf-8").split(" ", 10)
+            thesplit = readstuff.decode("utf-8").split(" ", 11)
             print("len of split is ",len(thesplit))
 
 
             if len(thesplit) > 8:
-                temperature = self.tempoidsToDegreesC(int(thesplit[6],16))
-                print("Temperature: ", temperature)
+                # example of "letters": SMFSV
+                print("Letters: ", thesplit[10])
 
-                timeasinteger = int(time.time())
+                #O means main contactor on, vehicle is on, so log temperatures
+                if "O" in thesplit[10]:
+                    print("Main contactor OK")
 
-                # only log once per second
-                if timeasinteger != lastLoggedTime:
-                    lastLoggedTime = timeasinteger
-                    self.mqttClient.publish("zillaTemperature",temperature);
-                    with open('temperature.csv', mode='a') as temperatures_file:
-                        temperature_writer = csv.writer(temperatures_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                        temperature_writer.writerow([timeasinteger,
-                                                   temperature])
+                    temperature = self.tempoidsToDegreesC(int(thesplit[6],16))
+                    print("Temperature: ", temperature)
+
+                    timeasinteger = int(time.time())
+
+                    # only log once per second
+                    if timeasinteger != lastLoggedTime:
+                        lastLoggedTime = timeasinteger
+                        self.mqttClient.publish("zillaTemperature",temperature);
+                        with open('temperature.csv', mode='a') as temperatures_file:
+                            temperature_writer = csv.writer(temperatures_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                            temperature_writer.writerow([timeasinteger,
+                                                        temperature])
 
 
     def tempoidsToDegreesC(self, tempoids):
-
         switcher = {
             26:1374,
             27:1431,
@@ -202,7 +208,43 @@ class ZillaDecoder:
             137: 7757,
             138: 7815,
             139: 7872,
-            140: 7930
+            140: 7930,
+            141: 7987,
+            142: 8045,
+            143: 8103,
+            144: 8160,
+            145: 8218,
+            146: 8275,
+            147: 8333,
+            148: 8390,
+            149: 8448,
+            150: 8506,
+            151: 8563,
+            152: 8621,
+            153: 8678,
+            154: 8736,
+            155: 8793,
+            156: 8851,
+            157: 8909,
+            158: 8966,
+            159: 9024,
+            160: 9081,
+            161: 9139,
+            162: 9196,
+            163: 9254,
+            164: 9312,
+            165: 9369,
+            166: 9427,
+            167: 9484,
+            168: 9542,
+            169: 9599,
+            170: 9657,
+            171: 9715,
+            172: 9772,
+            173: 9830,
+            174: 9887,
+            175: 9945,
+            176: 10000
             }
 
         return switcher.get(tempoids, 0)
@@ -218,75 +260,4 @@ if thePort != '':
 
 
 
-            # 141:
-            #     7987,
-            # 142:
-            #     8045,
-            # 143:
-            #     8103,
-            # 144:
-            #     8160,
-            # 145:
-            #     8218,
-            # 146:
-            #     8275,
-            # 147:
-            #     8333,
-            # 148:
-            #     8390,
-            # 149:
-            #     8448,
-            # 150:
-            #     8506,
-            # 151:
-            #     8563,
-            # 152:
-            #     8621,
-            # 153:
-            #     8678,
-            # 154:
-            #     8736,
-            # 155:
-            #     8793,
-            # 156:
-            #     8851,
-            # 157:
-            #     8909,
-            # 158:
-            #     8966,
-            # 159:
-            #     9024,
-            # 160:
-            #     9081,
-            # 161:
-            #     9139,
-            # 162:
-            #     9196,
-            # 163:
-            #     9254,
-            # 164:
-            #     9312,
-            # 165:
-            #     9369,
-            # 166:
-            #     9427,
-            # 167:
-            #     9484,
-            # 168:
-            #     9542,
-            # 169:
-            #     9599,
-            # 170:
-            #     9657,
-            # 171:
-            #     9715,
-            # 172:
-            #     9772,
-            # 173:
-            #     9830,
-            # 174:
-            #     9887,
-            # 175:
-            #     9945,
-            # 176:
-            #     10000,
+            
