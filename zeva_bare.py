@@ -36,7 +36,6 @@ current = 0.0
 fakeCurrent = 0
 skipCounter = 0
 elements = []
-zillaTemperature = 0
 gps_lat = 0.0
 gps_lon = 0.0
 gps_speed = 0.0
@@ -54,7 +53,7 @@ class BunchOfButtons():
     global fakeCurrent
     global skipCounter
     global elements
-    global zillaTemperature
+    zillaTemperature = 0
     global gps_lat, gps_lon, gps_speed, gps_alt, gps_course, gps_sat_in_use, gps_valid
 
     def processMqttMessage(self, client, userdata, message):
@@ -63,8 +62,8 @@ class BunchOfButtons():
 
         print("~~~~~>Got topic: ", topic)
         if(topic == 'zillaTemperature'):
-            zillaTemperature = message
-            print("Got zilla temperature of ",zillaTemperature)
+            self.zillaTemperature = message
+            print("Got zilla temperature of ",self.zillaTemperature)
 
     def mqttOnConnect(self, client, userdata, flags, rc):
         print("mqttOnConnect: userdata ",userdata," and flags ",flags, " and rc ",rc)
@@ -79,7 +78,6 @@ class BunchOfButtons():
         global config
         global mqttClient
         global lastNotificationTime
-        global zillaTemperature
 
         tl = Timeloop()
 
@@ -217,6 +215,7 @@ class BunchOfButtons():
             if(biggestDifference > 0.25 or gps_speed > 2):
                 print("logging")
                 with open('voltages.csv', mode='a') as voltages_file:
+                    print("Logging zillaTemperature of ", self.zillaTemperature)
                     voltage_writer = csv.writer(voltages_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     voltage_writer.writerow([timeasinteger,
                                             elements[0],
@@ -254,7 +253,7 @@ class BunchOfButtons():
                                             temperatures[0],
                                             current,
                                             gps_lat, gps_lon, gps_speed, gps_alt, gps_course, gps_sat_in_use, gps_valid,
-                                            zillaTemperature])
+                                            self.zillaTemperature])
 
             theElements = []
             for n in range(32):
