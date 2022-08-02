@@ -99,7 +99,10 @@ class TempCharacteristic(Characteristic):
             highByteCurrent = (int(float(current)) & 0xff00) >> 8
             lowByteCurrent  = (int(float(current)) & 0x00ff)
 
-            value = [highByteHighestVoltage, lowByteHighestVoltage, highByteLowestVoltage, lowByteLowestVoltage, highByteCurrent, lowByteCurrent, temperatures, int(gps_speed)]
+            highByteZillaTemperature = (int(float(zillaTemperature)) & 0xff00) >> 8
+            lowByteZillaTemperature  = (int(float(zillaTemperature)) & 0x00ff)
+
+            value = [highByteHighestVoltage, lowByteHighestVoltage, highByteLowestVoltage, lowByteLowestVoltage, highByteCurrent, lowByteCurrent, temperatures, int(gps_speed), highByteZillaTemperature, lowByteZillaTemperature]
 
         print(value)
         return value

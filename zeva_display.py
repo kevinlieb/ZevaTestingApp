@@ -4,6 +4,7 @@ import math
 import array as arr
 import csv
 import time
+import traceback
 
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -23,7 +24,6 @@ import paho.mqtt.client as mqtt
 import json
 
 from Bar import Bar
-from CurrentBar import CurrentBar
 import requests
 
 window_width = 1800
@@ -54,12 +54,17 @@ speedMeters = []
 bars = []
 temperatures = []
 previousVoltages = []
-ampMeter = CurrentBar()
 meterLabels = []
 mqttClient = []
 current = 0.0
 fakeCurrent = 0
 skipCounter = 0
+chargeState = ""
+packVoltage = 0.0
+initialized = False
+elements = []
+highestVoltage = 500.0
+lowestVoltage = 0.0
 
 class BunchOfButtons(GridLayout):
     global db
@@ -67,10 +72,13 @@ class BunchOfButtons(GridLayout):
     global relayboard
     global speedMeters
     global temperatures
-    global ampMeter
     global current
     global fakeCurrent
     global skipCounter
+    global chargeState 
+    global packVoltage
+    global initialized
+    global elements
 
     grayColor = (1,1,1,1)
     redColor = (0,0.5,0,.85)
@@ -78,6 +86,8 @@ class BunchOfButtons(GridLayout):
     def __init__(self, **kwargs):
         global db
         global config
+        global initialized
+        global elements
 
         global mqttClient
         global lastNotificationTime
@@ -93,8 +103,16 @@ class BunchOfButtons(GridLayout):
         def on_mqtt_connect(client, userdata, flags, rc):  # The callback for when the client connects to the broker
             print("Connected with result code {0}".format(str(rc)))  # Print result of connection attempt
             client.subscribe("voltages")  # Subscribe to the topic “voltages”
+            client.subscribe("chargeState") 
+            client.subscribe("packVoltage") 
 
         def on_mqtt_message(client, userdata, msg):
+            global elements
+            global highestVoltage
+            global lowestVoltage
+            global chargeState
+            global packVoltage
+
             print("Message received-> " + msg.topic + " " + str(msg.payload))
             if(msg.topic == 'voltages'):
                 message = str(msg.payload.decode("utf-8"))
@@ -103,26 +121,39 @@ class BunchOfButtons(GridLayout):
                 digits = message.split(", ")
                 print(digits)
 
-            if(use_speedmeter):
-                elements = speedMeters
-            else:
-                elements = bars;
+                if(use_speedmeter):
+                    elements = speedMeters
+                else:
+                    elements = bars;                
 
-            highestVoltage = 0.0
-            lowestVoltage = 500.0
-            n = 0
-            for x in digits:
-                elements[n].value = float(x)
-                if(float(x) > highestVoltage):
-                    highestVoltage = float(x)
-                if(float(x) < lowestVoltage):
-                    lowestVoltage = float(x)
-                meterLabels[n].text = "{:.2f}".format(elements[n].value / 100)
-                n = n + 1
+                try:
+                    if(initialized == True):
+                        print("Initialized is true")
+                        n = 0
+                        for x in digits:
+                            elements[n].value = float(x)
+                            if(float(x) > highestVoltage):
+                                highestVoltage = float(x)
+                            if(float(x) < lowestVoltage):
+                                lowestVoltage = float(x)
+                            meterLabels[n].text = "{:.2f}".format(elements[n].value / 100)
+                            n = n + 1
+                except:
+                    print("Failed to do shit")
+                    traceback.print_exc()
+    
+
+            if(msg.topic == 'chargeState'):
+                chargeState = msg.payload.decode("utf-8")
+                print("charge state: ",chargeState)
+
+            if(msg.topic == 'packVoltage'):
+                packVoltage = msg.payload.decode("utf-8")
+
 
         print("Starting MQTT")
         mqttClient = mqtt.Client("zevaclient") # Create a MQTT client object
-        mqttClient.connect("192.168.87.67", 1883) # Connect to the test MQTT broker
+        mqttClient.connect("hummbug2", 1883) # Connect to the test MQTT broker
         mqttClient.on_connect = on_mqtt_connect
         mqttClient.on_message = on_mqtt_message
         mqttClient.loop_start()
@@ -143,6 +174,12 @@ class BunchOfButtons(GridLayout):
             print("Every Second")
             global lastNotificationTime
             global config
+            global elements
+            global highestVoltage
+            global lowestVoltage
+            global chargeState
+            global packVoltage
+
             print(Window.size)
             self.size=(Window.size[0], Window.size[1])
 
@@ -200,14 +237,15 @@ class BunchOfButtons(GridLayout):
             elements[highestVoltageCellNumber].background_color = [1,0,0,1]
             elements[lowestVoltageCellNumber].background_color = [0,0,1,1]
 
-            ampMeter.value = current
-
             #if no temperatures are set yet initialize them here 
             if(len(temperatures) == 0):
                 temperatures.append(0.0)
 
+            print("Charge state is ",chargeState)
+            statusText.text = "Charge state: " + chargeState + " Pack: " + str(packVoltage)
 
-        theGrid = GridLayout(cols=4, rows=16, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
+
+        theGrid = GridLayout(cols=4, rows=17, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])
 
         super(BunchOfButtons, self).__init__(**kwargs)
 
@@ -242,12 +280,8 @@ class BunchOfButtons(GridLayout):
                 innerGrid.add_widget(bar)
                 innerGrid.add_widget(innerLabel)
                 theGrid.add_widget(innerGrid) 
-
-        ampMeter = CurrentBar()
-        ampMeter.orientation = 'bt';
-        ampMeter.max = 40000
-        ampMeter.min = -40000
-        theGrid.add_widget(ampMeter)               
+        initialized = True
+        print("set Initialized to true")
 
         with theGrid.canvas.before:
             Color(.8,.8,.8,1)
@@ -273,7 +307,7 @@ class BunchOfButtons(GridLayout):
         speedGrid.add_widget(speedLabel)
         #theGrid.add_widget(speedGrid) //for future use
 
-        statusText = ScrollableLabel(height=Window.size[1]*0.3, size_hint_y=None)
+        statusText = Label(height=Window.size[1]*0.3, size_hint_y=.3,bold=True,color=[0,0,0,1])
         theGrid.add_widget(statusText)        
 
         Clock.schedule_interval(everySecondCallback, 1)
@@ -338,7 +372,6 @@ class MessageListener():
         global speedMeters
         global bars
         global temperatures
-        global ampMeter
         global meterLabels
         global current
         global fakeCurrent
