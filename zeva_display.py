@@ -18,7 +18,7 @@ from kivy.uix.spinner import Spinner
 from kivy.graphics import Color, Rectangle
 from kivy.modules import inspector
 from kivy.uix.scrollview import ScrollView
-from kivy_garden.speedmeter import SpeedMeter
+#from speedmeter import SpeedMeter
 
 import paho.mqtt.client as mqtt
 import json
@@ -61,6 +61,7 @@ fakeCurrent = 0
 skipCounter = 0
 chargeState = ""
 packVoltage = 0.0
+chargeCurrent = 0.0
 initialized = False
 elements = []
 highestVoltage = 500.0
@@ -77,8 +78,14 @@ class BunchOfButtons(GridLayout):
     global skipCounter
     global chargeState 
     global packVoltage
+    global chargeCurrent
     global initialized
     global elements
+
+    lastChargeStateTime = 0
+    lastPackVoltageTime = 0
+    lastChargeCurrentTime = 0
+
 
     grayColor = (1,1,1,1)
     redColor = (0,0.5,0,.85)
@@ -105,6 +112,7 @@ class BunchOfButtons(GridLayout):
             client.subscribe("voltages")  # Subscribe to the topic “voltages”
             client.subscribe("chargeState") 
             client.subscribe("packVoltage") 
+            client.subscribe("chargeCurrent") 
 
         def on_mqtt_message(client, userdata, msg):
             global elements
@@ -112,6 +120,7 @@ class BunchOfButtons(GridLayout):
             global lowestVoltage
             global chargeState
             global packVoltage
+            global chargeCurrent
 
             print("Message received-> " + msg.topic + " " + str(msg.payload))
             if(msg.topic == 'voltages'):
@@ -144,11 +153,17 @@ class BunchOfButtons(GridLayout):
     
 
             if(msg.topic == 'chargeState'):
+                self.lastChargeStateTime = int(time.time()) 
                 chargeState = msg.payload.decode("utf-8")
                 print("charge state: ",chargeState)
 
             if(msg.topic == 'packVoltage'):
+                self.lastPackVoltageTime = int(time.time()) 
                 packVoltage = msg.payload.decode("utf-8")
+
+            if(msg.topic == 'chargeCurrent'):
+                self.lastChargeCurrentTime = int(time.time()) 
+                chargeCurrent = msg.payload.decode("utf-8")
 
 
         print("Starting MQTT")
@@ -179,6 +194,7 @@ class BunchOfButtons(GridLayout):
             global lowestVoltage
             global chargeState
             global packVoltage
+            global chargeCurrent
 
             print(Window.size)
             self.size=(Window.size[0], Window.size[1])
@@ -241,8 +257,12 @@ class BunchOfButtons(GridLayout):
             if(len(temperatures) == 0):
                 temperatures.append(0.0)
 
-            print("Charge state is ",chargeState)
-            statusText.text = "Charge state: " + chargeState + " Pack: " + str(packVoltage)
+            currentIntTime = int(time.time())
+            if((currentIntTime - self.lastChargeStateTime > 120) or (currentIntTime - self.lastPackVoltageTime > 120)):
+                statusText.text = "No charge data available"
+            else:
+                print("Charge state is ",chargeState)
+                statusText.text = "Charge state: " + chargeState + " Pack: " + str(packVoltage) + " Current: " + str(chargeCurrent) + "A"
 
 
         theGrid = GridLayout(cols=4, rows=17, width=the_grid_width, size_hint=(None, 1), spacing=[5,5])

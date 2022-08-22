@@ -27,6 +27,9 @@ class ThunderstruckChargerDecoder:
 
 
     def serialConnectToThunderstruck(self, thePort):
+        packVoltage = 0
+        chargeCurrent = 0.0
+        chargeState = "Unknown"
         lastLoggedTime = 0
 
         print("Attempting serial connect")
@@ -61,22 +64,37 @@ class ThunderstruckChargerDecoder:
         while 1:
             readstuff = ser.readline()
             print("READB:",readstuff)
-            thesplit = readstuff.decode("utf-8").split(" ", 11)
+
             if b'state    :' in readstuff:
-                chargeState = readstuff[13:len(readstuff)-2]
-                print("State is ", chargeState)
+                try:
+                    chargeState = readstuff[13:len(readstuff)-2]
+                    print("State is ", chargeState)
+                except:
+                    print("Failed to decode chargeState")
 
             if b'    voltage:' in readstuff:
                 # convert the 125.2V to a float and store it
-                packVoltage = float(readstuff[13:len(readstuff) - 3])
-                print("Voltage is ", packVoltage)
+                try:
+                    packVoltage = float(readstuff[13:len(readstuff) - 3])
+                    print("Voltage is ", packVoltage)
+                except:
+                    print("Failed to decode voltage")
+
+            if b'current:' in readstuff:
+                try:
+                    chargeCurrent = float(readstuff[13:len(readstuff) - 3])
+                    print("Charge current:", chargeCurrent)
+                except:
+                    print("Failed to parse charge current")
             
             #last part of the message: sleep and ask for more data
             if b'  uptime   :' in readstuff:
                 self.mqttClient.publish("chargeState", chargeState);
                 self.mqttClient.publish("packVoltage", packVoltage);
+                self.mqttClient.publish("chargeCurrent", chargeCurrent);
                 time.sleep(2)
-                ser.write(b'show\r\n')
+            
+            ser.write(b'show\r\n')
 
 
 tsd = ThunderstruckChargerDecoder()
