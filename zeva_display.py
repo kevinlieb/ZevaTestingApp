@@ -82,6 +82,7 @@ class BunchOfButtons(GridLayout):
     global initialized
     global elements
 
+    lastVoltagesTime = 0
     lastChargeStateTime = 0
     lastPackVoltageTime = 0
     lastChargeCurrentTime = 0
@@ -114,6 +115,10 @@ class BunchOfButtons(GridLayout):
             client.subscribe("packVoltage") 
             client.subscribe("chargeCurrent") 
 
+        def on_mqtt_disconnect(client, userdata, rc):
+            # if disconnect is detected clear out all the voltages to show something is wrong
+            print("Disconnected!")
+
         def on_mqtt_message(client, userdata, msg):
             global elements
             global highestVoltage
@@ -124,6 +129,7 @@ class BunchOfButtons(GridLayout):
 
             print("Message received-> " + msg.topic + " " + str(msg.payload))
             if(msg.topic == 'voltages'):
+                self.lastVoltagesTime = int(time.time()) 
                 message = str(msg.payload.decode("utf-8"))
                 message = message.replace("[","")
                 message = message.replace("]","")
@@ -170,6 +176,7 @@ class BunchOfButtons(GridLayout):
         mqttClient = mqtt.Client("zevaclient") # Create a MQTT client object
         mqttClient.connect("hummbug2", 1883) # Connect to the test MQTT broker
         mqttClient.on_connect = on_mqtt_connect
+        mqttClient.on_disconnect = on_mqtt_disconnect
         mqttClient.on_message = on_mqtt_message
         mqttClient.loop_start()
 
@@ -196,7 +203,7 @@ class BunchOfButtons(GridLayout):
             global packVoltage
             global chargeCurrent
 
-            print(Window.size)
+            #print(Window.size)
             self.size=(Window.size[0], Window.size[1])
 
             timeasinteger = int(time.time())
@@ -229,29 +236,36 @@ class BunchOfButtons(GridLayout):
             biggestDifference = 0
             whereBiggestDifference = 0
 
-            for n in range(32):
-                elements[n].background_color = [0,0,0,1]
-                if(elements[n].value > highestVoltage):
-                    highestVoltage = elements[n].value
-                    highestVoltageCellNumber = n
-                if(elements[n].value < lowestVoltage):
-                    lowestVoltage = elements[n].value
-                    lowestVoltageCellNumber = n
+            # if it has been more than 5 seconds since we saw a valid voltage message zero them out
+            if(int(time.time()) - self.lastVoltagesTime > 5):
+                for n in range(32):
+                    elements[n].background_color = [1,1,1,1] #gray
+                    elements[n].value = 3.0
+                    meterLabels[n].text = "-.--"
+            else:
+                for n in range(32):
+                    elements[n].background_color = [0,0,0,1]
+                    if(elements[n].value > highestVoltage):
+                        highestVoltage = elements[n].value
+                        highestVoltageCellNumber = n
+                    if(elements[n].value < lowestVoltage):
+                        lowestVoltage = elements[n].value
+                        lowestVoltageCellNumber = n
 
-                #calculate the biggest change in any cell voltage betweeen last sample
-                absoluteDifference = abs(elements[n].value - previousVoltages[n])
-                if(absoluteDifference > biggestDifference):
-                    whereBiggestDifference = n
-                    biggestDifference = absoluteDifference
+                    #calculate the biggest change in any cell voltage betweeen last sample
+                    absoluteDifference = abs(elements[n].value - previousVoltages[n])
+                    if(absoluteDifference > biggestDifference):
+                        whereBiggestDifference = n
+                        biggestDifference = absoluteDifference
 
-            for n in range(32):
-                previousVoltages[n] = elements[n].value
+                for n in range(32):
+                    previousVoltages[n] = elements[n].value
 
-            print("Highest volatage: " + str(highestVoltage))
-            print("Lowest volatage: " + str(lowestVoltage))
-            print("biggest difference: " + str(biggestDifference) + " at " + str(whereBiggestDifference))
-            elements[highestVoltageCellNumber].background_color = [1,0,0,1]
-            elements[lowestVoltageCellNumber].background_color = [0,0,1,1]
+                print("Highest volatage: " + str(highestVoltage))
+                print("Lowest volatage: " + str(lowestVoltage))
+                print("biggest difference: " + str(biggestDifference) + " at " + str(whereBiggestDifference))
+                elements[highestVoltageCellNumber].background_color = [1,0,0,1]
+                elements[lowestVoltageCellNumber].background_color = [0,0,1,1]
 
             #if no temperatures are set yet initialize them here 
             if(len(temperatures) == 0):
