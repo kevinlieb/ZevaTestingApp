@@ -92,6 +92,12 @@ class ThunderstruckChargerDecoder:
                 self.mqttClient.publish("chargeState", chargeState);
                 self.mqttClient.publish("packVoltage", packVoltage);
                 self.mqttClient.publish("chargeCurrent", chargeCurrent);
+                if(packVoltage < 129.0):
+                    message = b'set maxc 15\r\n'
+                else:
+                    print("Reduce charge current")
+                    message = b'set maxc 4\r\n'
+                ser.write(message)
                 time.sleep(2)
             
             ser.write(b'show\r\n')
