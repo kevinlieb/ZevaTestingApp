@@ -117,7 +117,7 @@ class BunchOfButtons(GridLayout):
 
         def on_mqtt_disconnect(client, userdata, rc):
             # if disconnect is detected clear out all the voltages to show something is wrong
-            print("Disconnected!")
+            print("MQTT Disconnected!")
 
         def on_mqtt_message(client, userdata, msg):
             global elements

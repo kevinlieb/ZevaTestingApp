@@ -88,19 +88,20 @@ class ThunderstruckChargerDecoder:
                     print("Failed to parse charge current")
             
             #last part of the message: sleep and ask for more data
+            message = b'';
             if b'  uptime   :' in readstuff:
                 self.mqttClient.publish("chargeState", chargeState);
                 self.mqttClient.publish("packVoltage", packVoltage);
                 self.mqttClient.publish("chargeCurrent", chargeCurrent);
                 if(packVoltage < 129.0):
-                    message = b'set maxc 15\r\n'
+                    print("Max Charge Current")
+                    message = b'\r\nset maxc 15\r\n\r\n'
                 else:
                     print("Reduce charge current")
-                    message = b'set maxc 4\r\n'
-                ser.write(message)
+                    message = b'\r\nset maxc 4\r\n\r\n'
                 time.sleep(2)
             
-            ser.write(b'show\r\n')
+            ser.write(b'' + message + b'show\r\n')
 
 
 tsd = ThunderstruckChargerDecoder()
