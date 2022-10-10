@@ -7,7 +7,7 @@ import json
 
 
 class ThunderstruckChargerDecoder:
-    mqttClient = ''
+    mqttClient = ''    
     
     def __init__(self):
         print("self centered")
@@ -27,6 +27,8 @@ class ThunderstruckChargerDecoder:
 
 
     def serialConnectToThunderstruck(self, thePort):
+        EOL = b'\r\n'
+
         packVoltage = 0
         chargeCurrent = 0.0
         chargeState = "Unknown"
@@ -36,7 +38,7 @@ class ThunderstruckChargerDecoder:
         ser = serial.Serial(thePort,9600,timeout=.2)
         print(ser)
         # send "enter a couple of times, look for EVCC
-        ser.write(b'\r\n\r\n')
+        ser.write(EOL + EOL)
         
         readstuffbuff = b''
 
@@ -52,7 +54,7 @@ class ThunderstruckChargerDecoder:
             print("READA:",readstuffbuff)
             if b'evcc>' in readstuffbuff:
                 print("Got the prompt")
-                ser.write(b'show\r\n') 
+                ser.write(b'show' + EOL) 
                 break
             else:
                 print("NOT the prompt")
@@ -60,6 +62,7 @@ class ThunderstruckChargerDecoder:
                 ser.write(b'\x1B')
                 time.sleep(1)
 
+        interval = 0
 
         while 1:
             readstuff = ser.readline()
@@ -93,15 +96,24 @@ class ThunderstruckChargerDecoder:
                 self.mqttClient.publish("chargeState", chargeState);
                 self.mqttClient.publish("packVoltage", packVoltage);
                 self.mqttClient.publish("chargeCurrent", chargeCurrent);
-                if(packVoltage < 129.0):
-                    print("Max Charge Current")
-                    message = b'\r\nset maxc 15\r\n\r\n'
+                if(interval >= 5):
+                    interval = 0
+                    if(packVoltage < 129.0):
+                        print("Max Charge Current")
+                        message = b'set maxc 15' + EOL + EOL
+                    else:
+                        print("Reduce charge current")
+                        message = b'set maxc 4' + EOL + EOL
                 else:
-                    print("Reduce charge current")
-                    message = b'\r\nset maxc 4\r\n\r\n'
+                        message = b'show' + EOL + EOL
                 time.sleep(2)
+                interval = interval + 1
+            else:
+              if b'' in readstuff:
+                  message = b'show' + EOL + EOL
+                  #time.sleep(2)
             
-            ser.write(b'' + message + b'show\r\n')
+            ser.write(message)
 
 
 tsd = ThunderstruckChargerDecoder()

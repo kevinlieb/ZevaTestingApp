@@ -4,6 +4,8 @@ import time
 import csv
 import paho.mqtt.client as mqtt
 import json
+from datetime import datetime
+
 
 
 class ZillaDecoder:
@@ -21,7 +23,7 @@ class ZillaDecoder:
         for port in myports:
             print(port[1]) #is the name of the port device, like "Keyspan USA-19H"
             if 'Keyspan' in port[1]:
-                #print("port is ",port[0])
+                print("port is ",port[0])
                 return(port[0])
         return("")
 
@@ -30,7 +32,8 @@ class ZillaDecoder:
         lastLoggedTime = 0
 
         print("Attempting serial connect")
-        ser = serial.Serial(thePort,9600,timeout=.2)
+
+        ser = serial.Serial(thePort,9600,timeout=.2,interCharTimeout=1.0)
         print(ser)
         # send "enter, escape, escape", wait half a second, then do it again
         ser.write(b'\r\n\x1B\x1B')
@@ -63,8 +66,12 @@ class ZillaDecoder:
 
 
         while 1:
+            now = datetime.now()
+            print(now)
+            print("Attempting to read a line")
             readstuff = ser.readline()
             print("READB:",readstuff)
+            print("Done reading stuff")
             thesplit = readstuff.decode("utf-8").split(" ", 11)
             print("len of split is ",len(thesplit))
 
